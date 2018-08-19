@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>独自集計ランキング views</title>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+  <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+  <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+</head>
+<body>
+
+<!-- Three Line List with secondary info and action -->
+<style>
+* {
+  font-family: 'Kozuka Gothic Pro';
+  font-weight: 750;
+  font-feature-settings : "palt";
+}
+body {
+  margin: 0 auto 111px;
+  width: 455px;
+  background-color: #eee;
+}
+
+h1 {
+	font-size: 1rem;
+}
+
+.for-video {
+	position: absolute;
+	top: 0;
+	right: 0;
+
+	font-size: 1px;
+}
+
+a {
+	text-decoration: none;
+	cursor: pointer !important;
+}
+
+.mdl-list__item-icon {
+	width: 50px;
+}
+
+.mdl-list__item--three-line .mdl-list__item-text-body {
+  height: 18px; /* デフォルト52px */
+  font-size: 9px;
+}
+
+.mdl-list__item--three-line {
+  height: 72px; /* デフォルト88px */
+  margin: 16px 0px;
+  background-color: #fff;
+}
+.mdl-list__item--three-line .mdl-list__item-primary-content,
+.mdl-list__item--three-line .mdl-list__item-secondary-content
+{
+  height: 36px; /* デフォルト52px */
+}
+.mdl-list__item .mdl-list__item-secondary-content .mdl-list__item-secondary-info {
+  white-space: nowrap;
+}
+.mdl-list__item--three-line * {
+  vertical-align: middle;
+}
+
+.mdl-list__item--three-line .mdl-list__item-secondary-content {
+  text-align: right;
+}
+
+.mdl-list__item:nth-child(7n) {
+background-image: linear-gradient(135deg, hsl(  0, 100%, 99%) 10%, hsl( 80, 93%, 98%) 100%);
+}
+.mdl-list__item:nth-child(7n+1) {
+background-image: linear-gradient(135deg, hsl( 52, 100%, 99%) 10%, hsl(132, 93%, 98%) 100%);
+}
+.mdl-list__item:nth-child(7n+2) {
+background-image: linear-gradient(135deg, hsl(104, 100%, 99%) 10%, hsl(184, 93%, 98%) 100%);
+}
+.mdl-list__item:nth-child(7n+3) {
+background-image: linear-gradient(135deg, hsl(156, 100%, 99%) 10%, hsl(236, 93%, 98%) 100%);
+}
+.mdl-list__item:nth-child(7n+4) {
+background-image: linear-gradient(135deg, hsl(208, 100%, 99%) 10%, hsl(288, 93%, 98%) 100%);
+}
+.mdl-list__item:nth-child(7n+5) {
+background-image: linear-gradient(135deg, hsl(260, 100%, 99%) 10%, hsl(340, 93%, 98%) 100%);
+}
+.mdl-list__item:nth-child(7n+6) {
+background-image: linear-gradient(135deg, hsl(312, 100%, 99%) 10%, hsl( 32, 93%, 98%) 100%);
+}
+
+
+</style>
+
+<h1>再生数ランキング</h1>
+
+<button class="for-video">動画用</button>
+
+<ul class="demo-list-three mdl-list"></ul>
+
+<script>
+const rankData =
+`1	344137	輝夜月	【世界初】何も始まってません【初ホラーゲーム実況】	https://www.youtube.com/watch?v=jNB3LA6rlAI
+2	186775	月ノ美兎	月ノ美兎の放課後ラジオ #5	https://www.youtube.com/watch?v=ReoXUn75JOM
+3	167019	YuNi	【生きろ】命に嫌われている 歌ってみた - YuNi	https://www.youtube.com/watch?v=85LtMbcugjI
+4	153961	かんな	【CoD BO4】神回！CoD No1実況者と対戦にかんな全力！-Miracle Episode-	https://www.youtube.com/watch?v=asnuzwHQPcE
+5	148245	キズナアイ(A.I.Channel)	【白猫テニス】コラボのうれしさ爆発で、まさかのネコ化！？	https://www.youtube.com/watch?v=4OSF0iapnU4
+6	127852	ゲーム部プロジェクト	【君の名は】部長、宇宙へ往く	https://www.youtube.com/watch?v=L84MV5vJvkQ
+7	118415	ミライアカリ	【夏休みコラボ】あの有名美人女性YouTuberとゲームします！【番外編】	https://www.youtube.com/watch?v=eyWFr79brv8
+8	105106	にじさんじ	「月ノ美兎の夏休み〜課外授業編〜」公式ライブ配信	https://www.youtube.com/watch?v=5p4iIM0pPwI
+9	98468	猫宮ひなた	【Islands of Nyne】勝利の焼きプリンは最高だ！【#2】	https://www.youtube.com/watch?v=pJuAlurtKTI
+10	94921	ときのそら	【歌ってみた】サンドリヨン / ときのそら & バーチャルゴリラ	https://www.youtube.com/watch?v=zsBD66Sa5Yg
+11	90344	電脳少女シロ	暑くてイライラしている時にぴったりなゲーム【アングリーゲーム】	https://www.youtube.com/watch?v=XyKk5ZqoVZM
+12	81432	세아(セア)	A.I.가 딥러닝으로 사람들이 좋아 할만한 걸 잔뜩 넣어 페북 커버를 만들었더니 생기는 일?!  ゜ヮ゜?	https://www.youtube.com/watch?v=_dRavkjXPK4
+13	79572	キズナアイ(A.I.Games)	【Identity V】 私から逃げられると思った？【第五人格】	https://www.youtube.com/watch?v=pOjc5cmFLQc
+14	76019	本間ひまわり	【記念枠】人気ゲーム3作品やるどー!【みんなありがと】	https://www.youtube.com/watch?v=D1CDdTlTtWs
+15	72858	ヒメヒナ	ヒメヒナ初投稿MV「ようこそバーチャルパークへ」feat.ばあちゃる48/ねこます	https://www.youtube.com/watch?v=He6NNULUom0
+16	69212	田中のおっさん	はじめまして!!田中のおっさんです。	https://www.youtube.com/watch?v=HtTttXSleRs
+17	66668	エルフのえる	【初めてのお歌枠】えるえる生放送	https://www.youtube.com/watch?v=Lv9MNL-oEFo
+18	63226	かしこまり	シュガーソングとビターステップ / UNISON SQUARE GARDEN（ cover by かしこまり ）	https://www.youtube.com/watch?v=GRh8XiHnXpw
+19	61185	ヨメミ_萌実_エイレーン	【FORTNITE】ヨメミから〇〇を禁止したら勝てなくなる説	https://www.youtube.com/watch?v=qBsb_NV8lng
+20	59274	物述有栖	♡はじめてのスライムお茶会♡	https://www.youtube.com/watch?v=po134lqkhvg
+21	59266	笹木咲	【Minecraft】2人で力をあわせてクリアするっ！【絆の檻】	https://www.youtube.com/watch?v=xJ9AyliO718
+22	52679	鈴鹿詩子	詩子とテリアサーガの夏 〜お姉さんと一緒に遊ぼう！〜	https://www.youtube.com/watch?v=keobnR1Byrs
+23	49663	おめがシスターズ	【コミケ】親分に新刊を渡したい	https://www.youtube.com/watch?v=N04WRd0V_Gg
+24	47901	宇志海いちご	よ！！！ぶれすとぐんこらぼ！！！	https://www.youtube.com/watch?v=dbHiqUFWnZg
+25	46453	夏実萌恵	EXTREME parkour challenge! [Hot Lava]	https://www.youtube.com/watch?v=jva64R6iXk4
+26	44559	静凛	しずりん狂った画家になるってよ！ #しずりん生放送	https://www.youtube.com/watch?v=KpHEOm6LvlE
+27	43835	富士葵	【Cover】ひこうき雲/荒井由実(松任谷由実)　Hikouki Gumo/Yumi Arai(Yumi Matsutoya)【弾き語り】	https://www.youtube.com/watch?v=YRMvGOA43Sc
+28	42668	森中花咲	10分で森中花咲を理解しろ！~配信版~	https://www.youtube.com/watch?v=-IPlL92eH-o
+29	40809	名取さな	名取さな、〇〇〇になるやつ告知します！	https://www.youtube.com/watch?v=yjiFUMhNOWw
+30	39922	剣持刀也	剣持刀也 ～トーキングトウヤ～	https://www.youtube.com/watch?v=sDBdhwqFrp8
+31	38767	ウェザーロイドAiri	【MCします】ペルセウス座流星群特別番組2018 全国7地点から生中継！	https://www.youtube.com/watch?v=9MlJsSUTALI
+32	38632	シスター・クレア	言ってはいけない言葉をいいました。	https://www.youtube.com/watch?v=oGAmdLILYGk
+33	37487	ドーラ	【019】怖いので一緒に寝たいドレイクとお話せんか？【2万人記念枠その2】	https://www.youtube.com/watch?v=slF2WHNZFi0
+34	37155	北上双葉	【ASMR-バイノーラル】すやすやねんねこふたば【アイドル部】	https://www.youtube.com/watch?v=Z_Nio0uM2-o
+35	36718	モイラ	MoimoiRadio　第18もい	https://www.youtube.com/watch?v=5Kpe1Xbbpqo
+36	36034	神楽めあ	プロVtuberだから秩序を乱す活動者に制裁を下す	https://www.youtube.com/watch?v=eu9g93Rx9PE
+37	35294	もこ田めめめ	【マリオカート8デラックス】今夜は"""勝ちたい"""【アイドル部】	https://www.youtube.com/watch?v=nYyvMrXhWUg
+38	33908	邪神ちゃん	邪神ちゃんねるV第4話	https://www.youtube.com/watch?v=jlaQniVq6pk
+39	32370	甲賀流忍者ぽんぽこ	【ぽこピー同時視聴】となりのトトロ 【金曜ロードSHOW】	https://www.youtube.com/watch?v=PjMTLicrasc
+40	31279	文野環	犬(夕陽リリ)とご主人様のコラボ	https://www.youtube.com/watch?v=giH05LEdmqo
+41	31092	織田信姫	【ガチ予想】もしもハンターハンターの世界にVTuberが来たらどんな念能力になるのか？	https://www.youtube.com/watch?v=t1_mV5b5PAk
+42	29353	勇気ちひろ	夏だ！ビキニだ！テリアサーガだ！	https://www.youtube.com/watch?v=V5MgiNVeXGA
+43	29261	カルロ・ピノ	【just shapes & beats】リズムの雨を避けろ！【雑談】	https://www.youtube.com/watch?v=tAA-EdZntEE
+44	28682	叶	【ChroNoiR】そういえば今度二人でホラゲやるよ【PUBG】	https://www.youtube.com/watch?v=NlYapLVnAl8
+45	27675	アズマリム	【ハロ／ハワユ-Hello / How are you-】歌ってみた	https://www.youtube.com/watch?v=1GdIPbiaZjc
+46	27332	鷹宮リオン	鷹宮リオン初配信、雑な雑談	https://www.youtube.com/watch?v=C-Ge5S2XQdw
+47	27170	のらきゃっと	のらきゃっとより、皆さまに大事なお知らせ	https://www.youtube.com/watch?v=V6A5Zd_zuPA
+48	26571	因幡はねる	【サイコパス診断】私はサイコパスじゃない！証明してみせる！【因幡はねる / あにまーれ】	https://www.youtube.com/watch?v=mKOMYHVXKb4
+49	26142	バーチャルおばあちゃん	バーチャルおばあちゃんねるCM18【最近きれいになったね編】	https://www.youtube.com/watch?v=6v7YI7Uzvcc
+50	25833	モグラアイ	オフゼロ動画の裏側で大変なことが起こってました… 前編	https://www.youtube.com/watch?v=alMy86LRl0U
+51	24442	花畑チャイカ	花畑チャイカと念願の	https://www.youtube.com/watch?v=araHRY83TyM
+52	24388	ハッカドール	ハッカドール、4さいになりましたっ！【誕生日】	https://www.youtube.com/watch?v=PmbyDvYtt_Y
+53	23797	周防パトラ	【ゲリラ】ハニストの飲み会配信【周防パトラ / ハニスト】	https://www.youtube.com/watch?v=QxiOZ_oermQ
+54	23586	花京院ちえり	【Nevermind】ちえりが精神科医になる。・ч・。#2【アイドル部】	https://www.youtube.com/watch?v=WMKa0cZmdjA
+55	23329	ふぇありす	【卒業します】重大発表・・・。	https://www.youtube.com/watch?v=jmzDi6RLv4g
+56	22247	神楽すず	【DOOM】アイドル志望がんばります。【アイドル部】	https://www.youtube.com/watch?v=QzWXMHrPmBo
+57	21838	薬袋カルテ	【描いてみた】「君の脈で踊りたかった」薬袋カルテ	https://www.youtube.com/watch?v=syzFfmmNj_k
+58	20717	闇夜乃モルル	もるるんわぁるど ♡ ボクについてお話するのだぁよ 🍜ψ\`( ・-・× )´↝	https://www.youtube.com/watch?v=fLYU96_4q0I
+59	20606	燦鳥ノム	【自己紹介】はじめまして、燦鳥ノム（さんとりのむ）です！	https://www.youtube.com/watch?v=BshXJ7hxcn8
+60	20387	殺戮の天使	【質問コーナー】#04 視聴者を断罪！	https://www.youtube.com/watch?v=TDjcY4uVWDw
+61	20151	白上フブキ	30000人記念ぷちお祝い雑談【フブキch】	https://www.youtube.com/watch?v=6zi8EXGziyE
+62	19845	ミソシタ	『ミソシタ#24』ミソシタ相談室・チビッコから相談がきた	https://www.youtube.com/watch?v=4Bq7AEImiWQ
+63	19832	神田笑一	【01】パシリ包丁が焼きそばパン買ってくる初Live配信	https://www.youtube.com/watch?v=lUkXxKu9ftM
+64	19674	リタ	スチャダラパー - サマージャム '95(Cover) / KMNZ	https://www.youtube.com/watch?v=VFkUSaO8cqQ
+65	19661	花野蜜	【DBDコラボ】ガールズDead by Daylight🌸きゃっきゃうふふ楽しみましょ💕【Vtuber】	https://www.youtube.com/watch?v=cbo3Xb1N7Ko
+66	19629	御来屋久遠	🔴 [声だけ] 御来屋、需要ある？ [バイノーラル]	https://www.youtube.com/watch?v=_KSgyIwiX1o
+67	19297	渋谷ハジメ	ハジメ・ハル・ユキミ・シラユリ　PUBG！	https://www.youtube.com/watch?v=vhRtL5jhu9M
+68	18012	マグロナ	コミケおつかれさまでした〜〜〜	https://www.youtube.com/watch?v=h7Z6WqtPy30
+69	17942	八重沢なとり	【Overwatch PS4版】クイック・プレイで遊びましょう(｀・ω・´)✨【アイドル部】	https://www.youtube.com/watch?v=TbIHH8Ao4zc
+70	17876	緑仙	第6回 これは歌っていません〜クラスで馴染むために邦ロックを学ぶ〜	https://www.youtube.com/watch?v=-_G1voEnw74
+71	17299	猫乃木もち	【お誕生日配信】ばいのーにゃる🐾【アイドル部】	https://www.youtube.com/watch?v=TVOEjmIp8aU
+72	17133	天神子兎音	【神様の水着】夏といえば、ラジオ体操！	https://www.youtube.com/watch?v=8pmLouGTAc8
+73	17126	ユキミお姉ちゃん	華みみガールズPUBGコラボ 🌸🌻🍵🤖	https://www.youtube.com/watch?v=vHpn3rUi1hU
+74	16938	ばあちゃる	【大乱闘】ついにばあちゃるマジギレ！？【激おこ】	https://www.youtube.com/watch?v=wppUsk_HtiQ
+75	16636	夜桜たま	【PUBG】みんなでドン勝を食べたい！！【アイドル部】	https://www.youtube.com/watch?v=jfz6n6jCrbY
+76	16026	ピピピピピ	【無職雑談】30歳ニートの社会復帰！日雇いバイト！【引きこもり克服】	https://www.youtube.com/watch?v=dQKTwtqKnyY
+77	15997	家長むぎ	【Vtuber】おえかきの森で遊びます🌷【参加型】	https://www.youtube.com/watch?v=s3ZlkLYxK44
+78	14973	小山内めい	【怒り心頭】ミソシー、めいは怒っています	https://www.youtube.com/watch?v=EKYX2LrBjpo
+79	14908	すーぱーそに子	【漢字クイズ】難解国名クイズに挑戦でうsよ〜【すーぱーそに子】	https://www.youtube.com/watch?v=HbwswMqNs-M
+80	14796	メイカ	【キズナアイ杯】決勝戦　歌衣メイカ視点【初代チャンピオン】	https://www.youtube.com/watch?v=yeRz72fxbzk
+81	14739	伏見ガク	感染者と共に世界を巡る　※負荷テスト配信	https://www.youtube.com/watch?v=WFnm1Xsco4I
+82	14432	魔界ノりりむ	【The Forest】👻2人は、おしぃりぃ🍼♯8【にじさんじゲーマーズ】	https://www.youtube.com/watch?v=_sQiSYoIO4w
+83	14347	ゴールドシップ	【大女優ゴルシ】怒涛のモノマネ10連発！@ウマ娘	https://www.youtube.com/watch?v=MrO45RVCkFA
+84	14291	藤崎由愛	【アキネイター】有名VTuber(四天王) VS YUA 誰が一番早く出てくるか【検証】	https://www.youtube.com/watch?v=AgVpE-brPJY
+85	13714	椎名唯華	【The Forest】👻2人は、おしぃりぃ🍼♯2【にじさんじゲーマーズ】	https://www.youtube.com/watch?v=ikx8FF9FC70
+86	13605	カフェ野ゾンビ子	ゾンビ子 犬を飼う!!!	https://www.youtube.com/watch?v=Q0tGNQo6ctU
+87	13363	響木アオ	【学園コラボ】YuNi & アオと真剣ゲームバトル！【プレゼントもあるよ】	https://www.youtube.com/watch?v=6MEt0mYwqfE
+88	13344	宇宙怪獣アンチン	ブロハラコラボwithにじさんじ!!!　地球侵略でGO!!!	https://www.youtube.com/watch?v=KD7tmig603A
+89	12945	メイドのユキさん	【ヘッドスパLIVEダイジェスト】耳オイルマッサージ＆おしぼりでふきふき＆ドライヤー（定期配信第10回より）	https://www.youtube.com/watch?v=80x-bPgdQsA
+90	12563	ンヌグム	谿コ縺輔縺滓律縺ョ縺薙	https://www.youtube.com/watch?v=K-t3akK7FAw
+91	12533	万楽えね	だらだらボダラン2とかやりたい	https://www.youtube.com/watch?v=YLhLxMlIFUE
+92	12377	蒼月エリ	【歌います】歌うぞ～～オ～～！！！【蒼月エリ / ハニスト】	https://www.youtube.com/watch?v=aLce6jrtyxc
+93	11974	アメノセイ	シャルル　歌ってみた【アメノセイ】	https://www.youtube.com/watch?v=AnLgzPgUet8
+94	11971	藤間桜	【藤間桜】歌ってみた『残酷な天使のテーゼ』	https://www.youtube.com/watch?v=8F1OoEBmR6E
+95	11848	舞元啓介	【初生放送】舞元啓介と申します。【#001】	https://www.youtube.com/watch?v=e-MWifBHDBE
+96	11273	おだのぶ	キズナアイ杯準優勝おだのぶが選ぶベストシーン3選	https://www.youtube.com/watch?v=YPpz3UojB3M
+97	10983	シラクサ	はじめてのfortnite	https://www.youtube.com/watch?v=x9_nlBASpSw
+98	10642	海夜叉神	【PUBG】Vtuber7人コラボ：あさひ+あっくん+ルカ+ハル+オボロ+ユキミ+海夜叉神！【視聴者参加型】	https://www.youtube.com/watch?v=yxiIg7hyg6Y
+99	10581	オッドアイ	【人狼殺】G!!	https://www.youtube.com/watch?v=-gSMKCzvXA0
+100	10535	皇牙サキ	【皇牙サキ】雑談配信4【コメしな】	https://www.youtube.com/watch?v=Owvh-7tnNxc
+101	10365	ロボ子さん	【固定生放送】今日はバーチャル桜部屋🌸【バイノーラル】	https://www.youtube.com/watch?v=5WN-RrnGC5o
+102	10299	松村上久郎	※パンツ注意【ドキッ❤︎真夏のお絵かき強化合宿！】6日目！（下久郎注意！）	https://www.youtube.com/watch?v=lht-Sy-0FX4
+103	10013	あっくん大魔王	【PUBG】オッパゲ淫魔獣VSゾンビ！！【あっくん大魔王視点】	https://www.youtube.com/watch?v=YbuwH61WvCE
+104	9899	牛巻りこ	【アイドル部】マインクラフトみたいなゲームで百獣の王を目指す【動物番長実況】	https://www.youtube.com/watch?v=bl5bJ0wjq7U
+105	9889	社築	#14 リーマン・ニート・学生全員集合川柳02	https://www.youtube.com/watch?v=N4--qNRz3Bs
+106	9683	岩本町芸能社	『あんたまとひなつくりはお話ししたい』	https://www.youtube.com/watch?v=iOilJtjKK0w
+107	9436	兎鞠まり	まぐろなちゃんと環境設定	https://www.youtube.com/watch?v=i9RbdUr6_tU
+108	9411	鈴谷アキ	【LIVE】雑談をしようしよう8【鈴谷アキ】	https://www.youtube.com/watch?v=b1rZjpmlQrA
+109	9179	島村シャルロット	【ゲーム】PUBG　パトラとPUBGやるぞ！！【島村シャルロット / ハニスト】	https://www.youtube.com/watch?v=1n0IW30CA5U
+110	9082	赤井はあと	鬼畜すぎるウサギゲームの実況＃2【Super Bunny Man】	https://www.youtube.com/watch?v=lerx8Sdc3Y4
+111	9010	虹河ラキ	#36【ゲーム実況】「Dead or School」プレイしてみたよ！（前編）【虹河ラキ/VTuber】	https://www.youtube.com/watch?v=w29hbB1sN5E
+112	8926	竹花ノート	ジェット○トリームアタック配信	https://www.youtube.com/watch?v=epk9zqQW3Jk
+113	8704	樋口楓	【にじさんじ夏リレー 最終日】でろーんとマルチプレイ！	https://www.youtube.com/watch?v=QiIWEHjRMXw
+114	8261	そよかぜアメ	【バイノーラル】夏祭り　花火を観よう　浴衣花火デート【ASMR】	https://www.youtube.com/watch?v=I-oSjfOpQTA
+115	8099	若菜レイ	【VTuber】ドラクエ11実況（ネタバレ注意）part2	https://www.youtube.com/watch?v=NRCYbaGiZMs
+116	8060	西園寺メアリ	【閲覧注意】メアリを介護？PUBGコラボ。私、初心者すぎて笑えなくない！！？【西園寺メアリ / ハニスト】	https://www.youtube.com/watch?v=URkXH0rhZk8
+117	8050	吟醸姉妹	【キングスレイド】厳選！私たちの最強パーティーはこれだ！	https://www.youtube.com/watch?v=mqFXwKs5hsE
+118	7816	さはな	笑って	https://www.youtube.com/watch?v=mM9GjPr6P_M
+119	7661	日ノ隈らん	【PUBG】乙女なPUBG【日ノ隈らん / あにまーれ】	https://www.youtube.com/watch?v=9XkYi3FnCbY
+120	7642	ウルケン・ノース	バイオ1クリアまでやるぞ！【収益申請達成記念】	https://www.youtube.com/watch?v=oeyEOLWGNL4
+121	7613	Icotsu	春日部つくしさん、ぽんぽこさんとホラー映画「死霊館」同時視聴コラボ！	https://www.youtube.com/watch?v=oNktytWQo8A
+122	7511	卯月コウ	テストするだけ	https://www.youtube.com/watch?v=_pxPG2Kw1Oo
+123	7496	じーえふ	【第一回ママ生】じーえふママ初めての生放送	https://www.youtube.com/watch?v=APiuiwbxq5g
+124	7484	葛葉	【#くずなま 09】久しぶりのPUBG	https://www.youtube.com/watch?v=t8z1eWllUvI
+125	7459	馬越健太郎	馬越レイディオ#7	https://www.youtube.com/watch?v=t5_KQXIYGiw
+126	7287	紫咲シオン	紫咲シオンの初ライブ！！ #紫咲シオン	https://www.youtube.com/watch?v=aiDUri__QnQ
+127	7286	宇森ひなこ	【はたらく細胞】Dr.ひなこちゃん5分耐久動画【宇森ひなこ / あにまーれ】	https://www.youtube.com/watch?v=DZA00kbOk5c
+128	7178	ヤマト・イオリ	【ドラゴンエッグ】ドラゴンはこんなにかっこいいんだよ【アイドル部】	https://www.youtube.com/watch?v=rKphfsxS164
+129	7005	黒咲りん	【7/22～7/28】くろりんの「今日は何の日」まとめ【＃4】	https://www.youtube.com/watch?v=jQG3hSzsaaQ
+130	6955	夏色まつり	【ハニスト】Gang beatsで生き残るのは誰だ！【ホロライブ】	https://www.youtube.com/watch?v=-qinZssmgZ8
+131	6857	堰代ミコ	【TheHOUSE2】放送事故覚悟でホラゲする【堰代ミコ / ハニスト】	https://www.youtube.com/watch?v=F9QbiJXSWBw
+132	6767	環右金	24時間企画　突撃！隣のVtuberさん　白百合さん×環右金（タマキン）	https://www.youtube.com/watch?v=nioyB9Wdai0
+133	6715	雪汝	【ホラーゲーム】詰んだのでsiriに聞いてみたら・・・www【にじさんじゲーマーズ】	https://www.youtube.com/watch?v=9T7JiL9wbRY
+134	6665	もちひよこ	激ムズ！ディズニー検定に挑戦♪（・8・）【021】	https://www.youtube.com/watch?v=ibmZYoyxjWA
+135	6504	白百合	知ってますか？#1	https://www.youtube.com/watch?v=SC0fqWFJrdk
+136	6495	リズ	LIZ RADIO #7	https://www.youtube.com/watch?v=oR2dtyp9Bi4
+137	6170	根羽清ココロ	【夏本番】日やけに悩んでいるあなたへ！【日やけ止め】	https://www.youtube.com/watch?v=bkxBxm1T2Is
+138	6141	かばん	夏休み!参加型でMHWを遊び尽くす枠🎒集会番号[4XsJZjBLaZji]	https://www.youtube.com/watch?v=PycEfqcxzdU
+139	6050	インサイドちゃん	【新番組】インサイドちゃんの番組 #1 ゲスト:ウェザーロイド TypeA Airiさん	https://www.youtube.com/watch?v=Pq_F2Gf2Mkg
+140	5977	水科葵	水科葵の日常RPG1時間SP	https://www.youtube.com/watch?v=vmLkPkNFNXM
+141	5851	心こはる	【 ドラクエ2 】今日から冒険が始まる！ 初見 ★ ドラゴンクエスト2 ［こはる ］女性実況　生放送★PS4 pro	https://www.youtube.com/watch?v=nTM5leJbpBY
+142	5643	銀河アリス	【夏といえば】山を征服したら地球の"てっぺん"をとったも同然だよね！【アウトドア】	https://www.youtube.com/watch?v=tWuJdLDKWcI
+143	5636	京極エミーリア皐月	1日耐久ニコニコ百物語視聴配信【Vtuber】	https://www.youtube.com/watch?v=78VWB7WeEEM
+144	5609	アキ・ローゼンタール	花火大会デートしませんか？【Vtuber/アキロゼ】	https://www.youtube.com/watch?v=o-runGL1Xk8
+145	5595	出雲霞	朝やスミ～禁断の月曜ごろごろ～	https://www.youtube.com/watch?v=lv9sfDT6OnQ
+146	5501	渋谷ハル	【PUBG】まんさくPC購入記念PUBG（おだのぶ、たかさきねき、まんさく、後からスイさん）【VTuber】	https://www.youtube.com/watch?v=RJ9Jeyoahsc
+147	5396	天羽よつは	📌【Vtuber】とっくん！！！【PUBG】	https://www.youtube.com/watch?v=cQAwlMFhmMs
+148	5316	春崎エアル	【ゲーム実況】ボーダーブレイク　ブロードキャスト	https://www.youtube.com/watch?v=MPR2NXzU7BI
+149	5259	湊あくあ	キレまくり！？この鬼ごっこ怖すぎ【オニアソビ】	https://www.youtube.com/watch?v=IjELpEyiLR4
+150	5202	東雲めぐ	はぴふり！東雲めぐちゃんのお部屋♪【8/15朝配信】	https://www.youtube.com/watch?v=3O-u8HZSLXU
+151	5167	海月ねう	【Lemon】レモネードの作り方🍋🍋	https://www.youtube.com/watch?v=KoL-opO6L68
+152	5084	雨森小夜	第一話　ねらわれた学園！？目覚める勇者！！	https://www.youtube.com/watch?v=AtLU2bHiVbE
+153	5012	天開司	天開司の(実はやってなかった)ゲーム(をやる)部　バイオハザード0編	https://www.youtube.com/watch?v=7-NIIFUjueE
+154	4998	宗谷いちか	雑談しながら診断・アプリしたりする！！！！！【宗谷いちか / あにまーれ】	https://www.youtube.com/watch?v=KOqN_G_So74
+155	4839	ゼノイフリート	ゼノコキュVSゼノイフ	https://www.youtube.com/watch?v=HrAREEPwnB0
+156	4778	皆守ひいろ	【初披露】可愛いくしゃみが出来る方法を伝授しよう🌻【雑学】	https://www.youtube.com/watch?v=EQGL-0HfhkE
+157	4667	りみむ	【MHW / モンハンワールド】狼女vs ベヒーモス ！弓ソロで倒してみせる！！リベンジ！！！(10時間経過)【Vtuber】	https://www.youtube.com/watch?v=bbIlB3NtOTc
+158	4640	千草はな	【OverWatch】ぱりぷろ狐こらぼっ！　#はなのです	https://www.youtube.com/watch?v=sP7DtMjMHYQ
+159	4351	カナタヒカリ	【ASMR】ヒカリの耳かき vol.6A【耳かきボイス】	https://www.youtube.com/watch?v=kmZV7Igpv-I
+160	4270	伊東悠人	【快眠動画？】おやすみ♡	https://www.youtube.com/watch?v=AhWhmyzEVus
+161	4228	宇佐元杏奈	【Quick,Draw!】杏奈画伯、AIとお絵かき対決っ！	https://www.youtube.com/watch?v=X2K9bsD4t08
+162	4074	夜野とばり	おさけのおはなし	https://www.youtube.com/watch?v=Ff5_3RuXYig
+163	3863	いるはーと	#19　【やればできる子】あの人に○○○○！！！【いるはーと】	https://www.youtube.com/watch?v=sh8PQ77H3zY
+164	3805	真空管ドールズ	【8/16(Thu)19:00～】アンナ&ブロッサム&アリシア？のゲーム実況生放送！【バーチャルYouTuber】	https://www.youtube.com/watch?v=_PVMOTf4Z3U
+165	3771	届木ウカ	【Beat Saber】夏休みはVRゲームで筋トレ！！【VR LIVE】	https://www.youtube.com/watch?v=AqTUqgZqMXg
+166	3729	柊椋	[ひいらぎちゃんねる第69回] 兎鞠まりちゃんと恋声についてお話します！	https://www.youtube.com/watch?v=xSPUUCowMP0
+167	3690	ヤマダダ	【ヤマダダ金曜】第8話：「死ぬわ、ヤマダ」	https://www.youtube.com/watch?v=SAEgXzIerYQ
+168	3531	宇宙物理たん	たのしく うたって アルファ・ベータ・ガンマ（ギリシャもじ）を おぼえましょ♪【うちゅうぶつりたんボット】	https://www.youtube.com/watch?v=r4OvpwQLw9Q
+169	3527	Overidea	【ゲーム実況】シエラと一緒に「Identity V」	https://www.youtube.com/watch?v=tHCcM2RHA7E
+170	3492	天帝犬	【 REV2 】天帝わんちゃんが闘神を目指す配信 #8	https://www.youtube.com/watch?v=DA0buvbEsb4
+171	3455	鈴木勝	#12 自分語りって何だ	https://www.youtube.com/watch?v=xzAG4fV1pKM
+172	3270	月夜ソラ	【ホラゲ実況】My Summer Vacation 前編 【月夜ソラ】	https://www.youtube.com/watch?v=yJAjNMLiPiw
+173	3130	イヌージョン	【夏休み22】夜のライブ【イヌ生放送】	https://www.youtube.com/watch?v=9O3ob8fMWiw
+174	3086	シロウケン	今までありがとうだ！この動画で最後だ！	https://www.youtube.com/watch?v=GoyyT33m8jM
+175	3004	虎妮(Hoonie)	【LIVE】#13 虎妮是不會輸的！二度挑戰洛克人 フニーは絶対負けないっ！ロックマンへの2度目の挑戦！	https://www.youtube.com/watch?v=3AxEN2AGumo
+176	3000	ぼっちぼろまる	ぼっちぼろまる - ゆらゆら花火	https://www.youtube.com/watch?v=HW6y-LeJgy8
+177	2905	伊月トウカ	【#14】ロックマンx3	https://www.youtube.com/watch?v=aabN43COhKc
+178	2901	ディープウェブ・アンダーグラウンド	DWU杯を開催しますわ！！！【#009】	https://www.youtube.com/watch?v=cWds1eXGYaQ
+179	2800	まじかるどーる	【祝1万人！】まつり＆紅羽のはちゃめちゃ生放送	https://www.youtube.com/watch?v=RYqqGRBX34o
+180	2779	あさひ	魑魅魍魎PUBG【あっくん・はるくん・アンチン】	https://www.youtube.com/watch?v=xHAPiKui7JM
+181	2772	たかじんちゃん	【12】 #3 くすり屋さんのoutlast実況プレイ	https://www.youtube.com/watch?v=ioOTEFEpiQI
+182	2765	動く城のフィオ	VRChat凸待ち　へにゃへにゃドワーフが「笑ったら回数×10回腹筋」	https://www.youtube.com/watch?v=D1syySR9XhE
+183	2764	魔法少女めあ	【ASMR】つくメア合宿・1日目第6部就寝（百物語）	https://www.youtube.com/watch?v=G-o_secSo1M
+184	2757	てるとくん	【第五人格】祭司4人でワープホール作りまくったらハンターが諦めたwwwww【IdentityⅤ】	https://www.youtube.com/watch?v=a9ONrR0ZPRc
+185	2723	名伽尾アズマ	OTN組夏休み6時間配信祭りフェスティバル～肝試し編～	https://www.youtube.com/watch?v=kC6DlNWt1Vs
+186	2720	りむとまき	暑かったあれの話をして魑魅マロ食べてゲームするやつ	https://www.youtube.com/watch?v=dEteAavgPWY
+187	2707	霊電カスカ	般若心経ロック！歌って！踊った！【霊電カスカ】	https://www.youtube.com/watch?v=WnGBn8eY2zo
+188	2689	朝ノ光	【Araya】 目と目が逢う瞬間好きだと気付いた【朝ノ光、朝ノ瑠璃】	https://www.youtube.com/watch?v=jeyzBWolCzk
+189	2676	すもも	[CoD BO4β]叶さんひまわりさんと！40kしたぞー！	https://www.youtube.com/watch?v=Yvqgxntj554
+190	2552	みるくぷりん	【みるくぷりん】らじお【メールテーマ「小中学生のころハマったゲーム」後編！】	https://www.youtube.com/watch?v=xgfBhVNxmVI
+191	2472	エルミナ	【コラボ#11】お盆に女子会＠異世界✨ クロスワードウルフ2🐺	https://www.youtube.com/watch?v=Qt-ZN5X9Pcg
+192	2303	ねこます	【メンズVtuber】Vaんぐみ 第四回【トークバラエティ】	https://www.youtube.com/watch?v=lAMOsHV6rns
+193	2290	珠根うた	うたとひなかのアフタートーク☘	https://www.youtube.com/watch?v=U55cGpjerqI
+194	2092	夜城明音	【夏休みスペシャル！】みんなのThat's life!⑤【24時間配信】	https://www.youtube.com/watch?v=cjfE459Nw5I
+195	1896	レンジル	レンジルのもぎたてフレッシュ（甲子園　金足農対近江　実況ジル！）	https://www.youtube.com/watch?v=ngFGb3LhvWc
+196	1879	仮面ライバーもやし	暗いof部屋ーでCRY OF FEAR	https://www.youtube.com/watch?v=VKAzBXAVkrs
+197	1861	風宮まつり	【吐いたら即終了】まつりの晩酌ライブ！	https://www.youtube.com/watch?v=bi3ToWF_Wg8
+198	1780	金剛いろは	【OverWatch】トレーサー練習日記。【アイドル部】	https://www.youtube.com/watch?v=-ocwjK7Vsdc
+199	1364	バーチャルねこ	【VCDR-0017】Virtual Cat / Cooking Neko	https://www.youtube.com/watch?v=bnTBGUW46mk
+200	441	りぃこ	【眠くなるVTuber】PUBGします♡乱入可	https://www.youtube.com/watch?v=FwZkConZxjo`;
+
+const html = rankData.split("\n")
+.map(line => line.split("\t"))
+.map((datum, i) => {
+  const [rank, views, name, title, link] = datum;
+  return `
+    <a class="mdl-list__item mdl-list__item--three-line mdl-shadow--2dp" href="${link}">
+      <span class="mdl-list__item-primary-content">
+        <img class="mdl-list__item-avatar" src="../icon/${name}.jpg"></img>
+        <span>${name}</span>
+        <span class="mdl-list__item-text-body">${title}</span>
+      </span>
+      <span class="mdl-list__item-secondary-content">
+        <span class="mdl-list__item-icon">${rank}</span>
+        <span class="mdl-list__item-secondary-info">
+          ${views} views
+        </span>
+      </span>
+    </a>
+  `;
+})
+.join("");
+
+$(".mdl-list").html(html);
+
+
+$(".for-video").on("click", () => {
+	$(".mdl-list__item").slice(50).remove();
+
+	$("html")
+	.animate({scrollTop: "1000000"}, 0, "easeInOutExpo")
+	.delay(2000).animate({scrollTop: "-=264"}, 600, "easeInOutExpo")
+	.delay(2000).animate({scrollTop: "-=264"}, 600, "easeInOutExpo")
+	.delay(2000).animate({scrollTop: "-=264"}, 600, "easeInOutExpo")
+	.delay(2000).animate({scrollTop: "-=264"}, 600, "easeInOutExpo")
+	.delay(2000).animate({scrollTop: "-=264"}, 600, "easeInOutExpo")
+	.delay(2000).animate({scrollTop: "-=264"}, 600, "easeInOutExpo")
+	.delay(2000).animate({scrollTop: "-=264"}, 600, "easeInOutExpo")
+	.delay(2000).animate({scrollTop: "-=264"}, 600, "easeInOutExpo")
+	.delay(2000).animate({scrollTop: "-=264"}, 600, "easeInOutExpo")
+	.delay(2000).animate({scrollTop: "-=264"}, 600, "easeInOutExpo")
+	.delay(2000).animate({scrollTop: "-=264"}, 600, "easeInOutExpo")
+	.delay(2000).animate({scrollTop: "-=264"}, 600, "easeInOutExpo")
+	.delay(2000).animate({scrollTop: "-=264"}, 600, "easeInOutExpo")
+	.delay(2000).animate({scrollTop: "-=264"}, 600, "easeInOutExpo")
+	.delay(2000).animate({scrollTop: "-=264"}, 600, "easeInOutExpo")
+	.delay(2000).animate({scrollTop: "-=264"}, 600, "easeInOutExpo")
+	.delay(2000).animate({scrollTop: "-=264"}, 600, "easeInOutExpo")
+	.delay(2000).animate({scrollTop: "-=264"}, 600, "easeInOutExpo")
+	.delay(2000).animate({scrollTop: "-=264"}, 600, "easeInOutExpo")
+	.delay(2000).animate({scrollTop: "-=264"}, 600, "easeInOutExpo")
+	;
+});
+
+</script>
+
+
+</body>
+</html>
